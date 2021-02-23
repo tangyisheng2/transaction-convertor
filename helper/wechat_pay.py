@@ -31,11 +31,12 @@ class WechatPay(base.TransactionBase):
         在目录中搜索微信支付的账单
         :return:
         """
-        for name in os.listdir(path):
+        file_names = os.listdir(path)
+        for name in file_names:
             if "微信支付账单" in name:
                 self.name = name
-                self._find_date()
                 self.path = os.path.join(path, self.name)
+                self._find_date()
                 break
         self.transactions = pd.read_csv(self.path, header=16)
 
@@ -57,14 +58,25 @@ class WechatPay(base.TransactionBase):
         整合同天相同消费
         :return:
         """
-        summarized_date = set(self.transactions["交易时间"])
-
+        summarized_date = list(set(self.transactions["交易时间"]))
+        summarized_date.sort()  # 时间排序
         result = pd.DataFrame(index=summarized_date, columns=["零钱", "零钱通"])
         for date in summarized_date:
             all_account = self.transactions[self.transactions["交易时间"] == date]
-            lingqian_account = all_account[all_account["支付方式"] == "零钱"]["金额(元)"].sum()
-            lingqiantong_account = all_account[all_account["支付方式"] == "零钱通"]["金额(元)"].sum()
-            result.loc[date] = [round(lingqian_account, 2), round(lingqiantong_account, 2)]  # 保留两位小数
+            lingqian_account = all_account[all_account["支付方式"] == "零钱"]
+            if lingqian_account.empty:
+                lingqian_expense, lingqian_income = 0, 0
+            else:
+                lingqian_expense = lingqian_account[lingqian_account["收/支"] == "支出"]["金额(元)"].sum()
+                lingqian_income = lingqian_account[lingqian_account["收/支"] == "收入"]["金额(元)"].sum()
+            lingqiantong_account = all_account[all_account["支付方式"] == "零钱通"]
+            if lingqiantong_account.empty:
+                lingqiantong_expense, lingqiantong_income = 0, 0
+            else:
+                lingqiantong_expense = lingqiantong_account[lingqiantong_account["收/支"] == "支出"]["金额(元)"].sum()
+                lingqiantong_income = lingqiantong_account[lingqiantong_account["收/支"] == "收入"]["金额(元)"].sum()
+            result.loc[date] = [round(lingqian_income - lingqian_expense, 2),
+                                round(lingqiantong_income - lingqiantong_expense, 2)]  # 保留两位小数
         self.summary = result
 
 
