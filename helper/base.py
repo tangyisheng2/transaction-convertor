@@ -20,4 +20,5 @@ class TransactionBase:
     end_date = datetime.date
     transactions = pd.DataFrame
     summary = pd.DataFrame
+    cur_balance = dict
 
