@@ -10,4 +10,4 @@
 2021/2/11     tangyisheng2        1.0             数据库链接
 """
 
-from . import base, wechat_pay
+from . import base, wechat_pay, alipay

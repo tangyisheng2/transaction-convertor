@@ -56,11 +56,12 @@ class WechatPay(base.TransactionBase):
         for index in range(0, self.transactions["金额(元)"].__len__()):
             self.transactions["金额(元)"][index] = float(self.transactions["金额(元)"][index].lstrip("¥"))
 
-    def date_summarize(self):
+    def summarize(self):
         """
         整合同天相同消费
         :return:
         """
+        self._pre_process()
         summarized_date = list(set(self.transactions["交易时间"]))
         summarized_date.sort()  # 时间排序
         result = pd.DataFrame(index=summarized_date, columns=["零钱", "零钱通"])
@@ -79,7 +80,7 @@ class WechatPay(base.TransactionBase):
                 lingqiantong_expense = lingqiantong_account[lingqiantong_account["收/支"] == "支出"]["金额(元)"].sum()
                 lingqiantong_income = lingqiantong_account[lingqiantong_account["收/支"] == "收入"]["金额(元)"].sum()
             lingqian_balance = round(self.cur_balance["零钱"] + lingqian_income - lingqian_expense, 2)
-            lingqiantong_balance = round(self.cur_balance["零钱通"] +lingqiantong_income - lingqiantong_expense, 2)
+            lingqiantong_balance = round(self.cur_balance["零钱通"] + lingqiantong_income - lingqiantong_expense, 2)
             result.loc[date] = [lingqian_balance, lingqiantong_balance]  # 保留两位小数
         self.summary = result
 
@@ -87,7 +88,6 @@ class WechatPay(base.TransactionBase):
 if __name__ == '__main__':
     test = WechatPay()
     test.read("../input")
-    test.set_init_amount(lingqian=0,lingqiantong=0)
-    test._pre_process()
-    test.date_summarize()
+    test.set_init_amount(lingqian=0, lingqiantong=0)
+    test.summarize()
     pass

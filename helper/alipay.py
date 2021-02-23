@@ -72,11 +72,12 @@ class AliPay(base.TransactionBase):
         for index in range(0, self.transactions["金额（元）"].__len__()):
             self.transactions["金额（元）"][index] = round(self.transactions["金额（元）"][index], 2)
 
-    def date_summarize(self):
+    def summarize(self):
         """
         整合同天相同消费
         :return:
         """
+        self._pre_process()
         summarized_date = list(set(self.transactions["交易创建时间"]))
         summarized_date.sort()  # 时间排序
         result = pd.DataFrame(index=summarized_date, columns=["支付宝总资产"])
@@ -92,8 +93,6 @@ class AliPay(base.TransactionBase):
 
 if __name__ == '__main__':
     test = AliPay()
-    test.set_init_amount(0)
     test.read("../input")
-    test._pre_process()
-    test.date_summarize()
+    test.summarize()
     pass
