@@ -13,6 +13,7 @@ from helper import base
 import os
 import re
 import pandas as pd
+import datetime
 
 
 class WechatPay(base.TransactionBase):
@@ -26,8 +27,8 @@ class WechatPay(base.TransactionBase):
         """
         pattern = re.compile(r'\d{8}')
         date_list = re.findall(pattern, self.name)
-        self.start_date = date_list[0]
-        self.end_date = date_list[1]
+        self.start_date = datetime.datetime.strptime(date_list[0], "%Y%m%d")
+        self.end_date = datetime.datetime.strptime(date_list[1], "%Y%m%d")
 
     def read(self, path):
         """
