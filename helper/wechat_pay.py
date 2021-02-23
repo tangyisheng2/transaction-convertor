@@ -16,6 +16,9 @@ import pandas as pd
 
 
 class WechatPay(base.TransactionBase):
+    def set_init_amount(self, lingqian, lingqiantong):
+        self.cur_balance = {"零钱": lingqian, "零钱通": lingqiantong}
+
     def _find_date(self):
         """
         从文件名中提取日期
@@ -75,14 +78,16 @@ class WechatPay(base.TransactionBase):
             else:
                 lingqiantong_expense = lingqiantong_account[lingqiantong_account["收/支"] == "支出"]["金额(元)"].sum()
                 lingqiantong_income = lingqiantong_account[lingqiantong_account["收/支"] == "收入"]["金额(元)"].sum()
-            result.loc[date] = [round(lingqian_income - lingqian_expense, 2),
-                                round(lingqiantong_income - lingqiantong_expense, 2)]  # 保留两位小数
+            lingqian_balance = round(self.cur_balance["零钱"] + lingqian_income - lingqian_expense, 2)
+            lingqiantong_balance = round(self.cur_balance["零钱通"] +lingqiantong_income - lingqiantong_expense, 2)
+            result.loc[date] = [lingqian_balance, lingqiantong_balance]  # 保留两位小数
         self.summary = result
 
 
 if __name__ == '__main__':
     test = WechatPay()
     test.read("../input")
+    test.set_init_amount(lingqian=0,lingqiantong=0)
     test._pre_process()
     test.date_summarize()
     pass
