@@ -80,13 +80,12 @@ class AliPay(base.TransactionBase):
         summarized_date = list(set(self.transactions["交易创建时间"]))
         summarized_date.sort()  # 时间排序
         result = pd.DataFrame(index=summarized_date, columns=["支付宝总资产"])
-        temp_balance = self.cur_balance["支付宝总资产"]
         for date in summarized_date:
             all_account = self.transactions[self.transactions["交易创建时间"] == date].copy()
             income = all_account[all_account["资金状态"] == "已收入"]["金额（元）"].copy().sum()
             expenses = all_account[all_account["资金状态"] == "已支出"]["金额（元）"].copy().sum()
-            temp_balance = round(temp_balance + expenses - income,2)
-            result.loc[date] = temp_balance  # 保留两位小数
+            self.cur_balance["支付宝总资产"] = round(self.cur_balance["支付宝总资产"] + expenses - income,2)
+            result.loc[date] = self.cur_balance["支付宝总资产"]  # 保留两位小数
         self.summary = result
         pass
 
