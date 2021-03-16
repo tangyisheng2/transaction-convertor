@@ -7,7 +7,7 @@
 
 @Modify Time        @Author     @Version        @Description
 ------------        -------     --------        -----------
-2021/2/11     tangyisheng2        1.0             数据库链接
+2021/2/11     tangyisheng2        1.0           Base Helper
 """
 import pandas as pd
 import datetime
