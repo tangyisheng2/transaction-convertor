@@ -53,9 +53,11 @@ class WechatPay(base.TransactionBase):
         """
         pattern = re.compile(r'\d{4}-\d{2}-\d{2}')
         for index in range(0, self.transactions["交易时间"].__len__()):
-            self.transactions["交易时间"][index] = re.match(pattern, self.transactions["交易时间"][index]).group()
+            # self.transactions["交易时间"][index] = re.match(pattern, self.transactions["交易时间"][index]).group()
+            self.transactions.loc[index, "交易时间"] = re.match(pattern, self.transactions.loc[index, "交易时间"]).group()
         for index in range(0, self.transactions["金额(元)"].__len__()):
-            self.transactions["金额(元)"][index] = float(self.transactions["金额(元)"][index].lstrip("¥"))
+            # self.transactions["金额(元)"][index] = float(self.transactions["金额(元)"][index].lstrip("¥"))
+            self.transactions.loc[index, "金额(元)"] = float(self.transactions.loc[index, "金额(元)"].lstrip("¥"))
 
     def summarize(self):
         """
