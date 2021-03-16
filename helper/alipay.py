@@ -67,10 +67,12 @@ class AliPay(base.TransactionBase):
         # 交易时间约整到日
         pattern = re.compile(r'\d{4}-\d{2}-\d{2}')
         for index in range(0, self.transactions["交易创建时间"].__len__()):
-            self.transactions["交易创建时间"][index] = re.match(pattern, self.transactions["交易创建时间"][index]).group()
+            # self.transactions["交易创建时间"][index] = re.match(pattern, self.transactions["交易创建时间"][index]).group()
+            self.transactions.loc[index, "交易创建时间"] = re.match(pattern, self.transactions.loc[index, "交易创建时间"]).group()
         # 交易净额转为float
         for index in range(0, self.transactions["金额（元）"].__len__()):
-            self.transactions["金额（元）"][index] = round(self.transactions["金额（元）"][index], 2)
+            # self.transactions["金额（元）"][index] = round(self.transactions["金额（元）"][index], 2)
+            self.transactions.loc[index, "金额（元）"] = round(self.transactions.loc[index, "金额（元）"], 2)
 
     def summarize(self):
         """
@@ -85,7 +87,7 @@ class AliPay(base.TransactionBase):
             all_account = self.transactions[self.transactions["交易创建时间"] == date].copy()
             income = all_account[all_account["资金状态"] == "已收入"]["金额（元）"].copy().sum()
             expenses = all_account[all_account["资金状态"] == "已支出"]["金额（元）"].copy().sum()
-            self.cur_balance["支付宝总资产"] = round(self.cur_balance["支付宝总资产"] + expenses - income,2)
+            self.cur_balance["支付宝总资产"] = round(self.cur_balance["支付宝总资产"] + expenses - income, 2)
             result.loc[date] = self.cur_balance["支付宝总资产"]  # 保留两位小数
         self.summary = result
         pass
