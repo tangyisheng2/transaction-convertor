@@ -84,12 +84,21 @@ class CMB(base.TransactionBase):
         获取每天最后的银行余额
         :return:
         """
+        # 1. 合并交易，求出每天最后的余额
         date_list = set(self.transactions["交易日期"])
-        self.summary = pd.DataFrame(index=date_list, columns=[f"CMB({self.card_number})余额"])
+        summary = pd.DataFrame(index=date_list, columns=[f"CMB({self.card_number})余额"])
+
         for date in date_list:
             latest_transaction_time = max(self.transactions.loc[self.transactions["交易日期"] == date, "交易时间"])
             index = (self.transactions["交易日期"] == date) & (self.transactions["交易时间"] == latest_transaction_time)
-            self.summary.loc[date] = float(self.transactions.loc[index, "余额"])
+            summary.loc[date] = float(self.transactions.loc[index, "余额"])
+        # 2. reindex与主表匹配
+        summary.index = pd.to_datetime(summary.index, format="%Y%m%d")
+        date_index = pd.date_range(self.start_date, self.end_date)
+        summary = summary.reindex(date_index).fillna(method="ffill")
+        # todo 表最前面的nan处理
+
+        pass
 
 
 if __name__ == '__main__':
