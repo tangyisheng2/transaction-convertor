@@ -10,7 +10,7 @@
 2021/2/11     tangyisheng2        1.0           Base Helper
 """
 import pandas as pd
-import datetime
+from datetime import datetime
 
 
 class TransactionBase:
@@ -22,3 +22,12 @@ class TransactionBase:
     summary = pd.DataFrame
     cur_balance = dict
 
+    def _set_start_end_date(self, start, end):
+        """
+        设置开始结束时间
+        :param start: 开始时间(YYYY-MM-DD)
+        :param end: 结束时间(YYYY-MM-DD)
+        :return:
+        """
+        self.start_date = datetime.strptime(start, "%Y-%m-%d")
+        self.end_date = datetime.strptime(end, "%Y-%m-%d")
